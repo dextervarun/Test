@@ -1,0 +1,168 @@
+
+<html>
+<style >
+.DELETEbutton{
+	background-color:grey;
+}
+.DELETEbutton:hover{
+	background-color: green;
+}
+#ENTERbutton:hover{
+	background-color: green;
+}
+.timer{
+	display: none;
+}	
+.nameedit{
+	display: none;
+	height:30px;
+	font-size:20px;
+}
+</style>
+<script type="text/javascript" src="jquery-3.1.1.min.js"></script>
+<script>
+	$( document ).ready(function(){
+		var counter=0;
+		var match=0;
+		var orderexists = 0;
+		var timer=setInterval(function(){
+			$(".timer").each(function(){
+				var colourcount = parseInt($(this).html());
+				
+				if (colourcount >= 0 && colourcount <30) {
+					$(this).closest("tr").css("background-color","white").css("font-size","40px");
+				}
+				else if (colourcount >= 30 && colourcount < 60){
+					$(this).closest("tr").css("background-color","yellow").css("font-size","40px");
+				}
+				else if (colourcount >=60){
+					$(this).closest("tr").css("background-color","red").css("color","white");
+				};
+				var total_seconds = colourcount+1;
+				var minutes = Math.floor(total_seconds/60);
+				var seconds = total_seconds - minutes*60 ;
+				if(seconds<10){seconds = "0"+ seconds;};
+				if(minutes<10){minutes = "0" + minutes;};
+				$(this).html(total_seconds);
+				$(this).closest("tr").find(".timeview").html(minutes+":"+seconds);
+		})}, 1000);
+
+
+
+
+
+	$("#ENTERbutton").on( "click", function(){
+		$("#errorbox").html("").css("background-color","white");
+		if (!$("#orderno").val()) {
+			$("#errorbox").html("Order Number cant be empty").css("color","red").css("font-size","20px");
+		}
+		
+		else{
+			if (counter==0){
+				$("#Table1").append("<tr style='border: 1px solid black;; font-size:40px;'><td class='ordernumber'>" + $("#orderno").val() + "</td><td class='ridername'><input type='text' class='nameedit' ><span class='namebox'>" + $("#name").val() + "</span><td><span class='timer'>0</span><span class='timeview'>00:00</span></td><td><button class='DELETEbutton' style='height:30px;width:50%;font-weight:bold;font-size:20px;color:white;'>YES</button></td></tr>");
+				counter++;
+				$("#orderno").val("");
+				$("#name").val("");
+			}
+			else{
+
+				$(".ordernumber").each(function(){
+					if (parseInt($(this).html()) == $("#orderno").val()){
+					$("#errorbox").html("This order number already exists").css("color","red").css("font-size","20px");
+					orderexists++;
+					return false; 
+				}});
+
+				if (orderexists==0) {
+					$(".ridername").each(function(){
+						if ($(this).text()== $("#name").val()){
+						$(this).closest("tr").before("<tr style='border: 1px solid black;; font-size:40px;'><td class='ordernumber'>" + $("#orderno").val() + "</td><td class='ridername'><input type='text' class='nameedit' ><span class='namebox'>" + $("#name").val() + "</span></td><td><span class='timer'>0</span><span class='timeview'>00:00</span></td><td><button class='DELETEbutton' style='height:30px;width:50%;font-weight:bold;font-size:20px;color:white;'>YES</button></td></tr>");
+						counter++;
+						match++;
+						$("#orderno").val("");
+						$("#name").val("");
+						return false;
+					}});
+
+					if(match==0){
+						$("#Table1").append("<tr style='border: 1px solid black;; font-size:40px;'><td class='ordernumber'>" + $("#orderno").val() + "</td><td class='ridername'><input type='text' class='nameedit' ><span class='namebox'>" + $("#name").val() + "</span></td><td><span class='timer'>0</span><span class='timeview'>00:00</span></td><td><button class='DELETEbutton' style='height:30px;width:50%;font-weight:bold;font-size:20px;color:white;'>YES</button></td></tr>");
+						counter++;
+						$("#orderno").val("");
+						$("#name").val("");
+					};
+				};
+			};
+			match=0;
+			orderexists=0;
+			
+  			};
+	});
+
+	$("#name, #orderno").keypress(function(e){
+        if(e.which == 13){
+            $('#ENTERbutton').click();
+        }
+    });
+
+
+	$("#Table1").on( "click", ".DELETEbutton", function(){
+	// alert($(this).text());	
+   //event.preventDefault();
+    $(this).closest("tr").remove();
+    counter--;
+    // return false;
+	});
+
+	$("#Table1").on("click","td",function(){
+		$(this).find(".namebox").css("display","none");
+		$(this).find(".nameedit").show().focus();
+		$(this).find(".nameedit").val($(this).find("span").html());	
+
+	});
+
+	$("#Table1").on("keypress",".nameedit",function(e){
+		if(e.which == 13){
+			$(this).hide();
+			$(this).closest("tr").find(".namebox").html($(this).val());
+			$(this).closest("tr").find(".namebox").show();
+			//return false;
+		}
+
+	});
+
+});
+</script>
+
+	<body>
+
+	<div style="width:100%;margin-top:10px;position:relative;text-align:center;">
+		<div style="display: inline-block;height:30px;"><input type="number" name="orderno" id="orderno" style="height:30px;font-size:20px;" placeholder="Order No"></div>
+		<div style="display: inline-block;height:30px;"><input type="text" name="name" id="name" style="height:30px;font-size:20px;" placeholder="Rider Name"></div>
+		<div style="display: inline-block;height:30px;"><button id="ENTERbutton" style="height:30px;width:100px;font-weight:bold;font-size:20px;margin-top:-2px;">ADD</button></div>
+		<div style="display: inline-block;width:100%;height:30px;line-height:30px;" id="errorbox"></div>
+	</div>
+
+<div>
+<table style="text-align:center" width="100%" align="center" id="Table2">
+	<tr><td style="border: 1px solid black; font-size:35px; font-weight:bold; color: white; background: green; width:30%">£2 per delivery ALL weekend in CBR</td></tr>
+</table>
+</div>
+
+<div>
+<table style="text-align:center" width="100%" align="center" id="Table2">
+	<tr><td style="border: 1px solid black; font-size:35px; font-weight:bold; color: white; background: green; width:30%">Deliver 5 orders in CBR between 5pm-10pm to get EXTRA £20!</td></tr>
+</table>
+</div>
+
+
+<div>
+<table style="border: 1px solid black ;text-align:center" width="100%" align="center" id="Table1">
+	<tr style="border: 1px solid black;"><td style="border: 1px solid black; font-size:40px; color: white; background: black; width:30%">ORDER NUMBER</td><td style="border: 1px solid black; font-size:40px; color: white; background: black; width:30%">RIDER NAME</td><td style="border: 1px solid black; font-size:40px; color: white; background: black; width:20%">TIME</td><td style="border: 1px solid black; font-size:40px; color: white; background: black; width:20%">ORDER TAKEN?</td></tr>
+</table>
+</div>
+</div>
+	
+	</body>
+
+</html>
+
